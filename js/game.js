@@ -20,7 +20,7 @@ function drawTag(f){const T=f.tag;if(!T)return;const hp=Math.max(0,Math.round(f.
 function statsFor(p){const c=DT.CH[p.char]||DT.CH[0],w=DT.WP[p.weapon]||DT.WP[0],L=(p.lv&&p.lv[p.char])||1;
  return{c,w,mhp:Math.round(100*c.hp*(1+L*.08)),dmg:c.dmg*(1+L*.1)*(1+(w.dmg-1)*.3),spd:c.spd,agi:c.agi,rng:1+(w.rng-3)*.12,kit:DT.PIDX[c.pw]||0}}
 function makeFighter(o){
- const look=window.Rig.lookFor(o.charId,o.col);const rig=window.Rig.build(look,o.glow);rig.g.traverse(m=>{if(m.isMesh)m.castShadow=!low});scene.add(rig.g);
+ const look=window.Rig.lookFor(o.charId,o.col);const rig=window.Rig.build(look,o.glow);rig.g.traverse(m=>{if(m.isMesh)m.castShadow=!m.userData.ol&&(!low||m.parent===rig.torso||m.parent===rig.hips||m.parent===rig.head)});scene.add(rig.g);
  const f=Object.assign({rig,look,x:0,y:0,z:0,vx:0,vy:0,vz:0,r:0,st:"free",stT:0,cd:[0,0,0,0],m1i:-1,m1T:0,m1CD:0,dashT:0,dashCD:0,dashDir:"F",blk:false,blkT:9,guard:100,awk:0,awT:0,fin:false,evT:0,inv:0,carry:null,pend:[],lock:0,root:null,buff:{},sh:0,ph:0,anState:"idle",fl:0,mv:false,air:false,dead:false,rt:0,hist:[],histT:0},o);
  f.kitDef=KITS[f.kit%KITS.length];nameTag(f);
  const ice=new THREE.Mesh(new THREE.BoxGeometry(2.4,5.4,2.4),new THREE.MeshStandardMaterial({color:0xaee9ff,transparent:true,opacity:.55,roughness:.1}));ice.position.y=2.7;ice.visible=false;rig.g.add(ice);f.ice=ice;
@@ -292,7 +292,7 @@ function start(o){
  ren=new THREE.WebGLRenderer({antialias:!low,powerPreference:"high-performance"});ren.setSize(innerWidth,innerHeight);ren.setPixelRatio(Math.min(devicePixelRatio||1,low?1.25:1.75));
  ren.shadowMap.enabled=true;ren.shadowMap.type=THREE.PCFSoftShadowMap;ren.toneMapping=THREE.ACESFilmicToneMapping;ren.toneMappingExposure=1.25;
  document.body.appendChild(ren.domElement);
- World.build(scene,{low});FX.init(scene,cam,$("fxc"),low);if(low){cam.far=320;cam.updateProjectionMatrix();scene.fog.near=60;scene.fog.far=240}
+ Rig.setQuality(low);World.build(scene,{low});FX.init(scene,cam,$("fxc"),low);if(low){cam.far=320;cam.updateProjectionMatrix();scene.fog.near=60;scene.fog.far=240}
  const S=statsFor(pf),sk=DT.SKINS[pf.skin||0];
  me=makeFighter({name:pf.username,charId:pf.char,col:sk&&sk[1]!=null?sk[1]:S.c.col,glow:S.w.col,kit:S.kit,isMe:true});me.tag.s.visible=false;me.S=S;me.hp=me.mhp=S.mhp;const sp=spawnPoint();me.x=sp[0];me.z=sp[1];me.ctrl=true;drawTag(me);
  if(mode==="online"){ch=window.Backend.join(o.room,{id:myId,name:pf.username},{state:onState,hit:onHit,leave:onLeave});
