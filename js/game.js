@@ -14,7 +14,7 @@ const rnd=(a,b)=>a+Math.random()*(b-a);
 const TOUCH="ontouchstart" in window;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 // ---------- fighters ----------
-function nameTag(f){const c=document.createElement("canvas");c.width=256;c.height=72;const t=new THREE.CanvasTexture(c);const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthTest:false}));s.scale.set(4.6,1.3,1);s.position.y=6.6;s.renderOrder=5;f.rig.g.add(s);f.tag={c,t,s,last:-1};drawTag(f)}
+function nameTag(f){const c=document.createElement("canvas");c.width=256;c.height=72;const t=new THREE.CanvasTexture(c);const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthTest:false}));s.scale.set(4.6,1.3,1);s.position.y=7.2;s.renderOrder=5;f.rig.g.add(s);f.tag={c,t,s,last:-1};drawTag(f)}
 function drawTag(f){const T=f.tag;if(!T)return;const hp=Math.max(0,Math.round(f.hp));if(hp===T.last)return;T.last=hp;const x=T.c.getContext("2d");x.clearRect(0,0,256,72);x.font="bold 26px system-ui,sans-serif";x.textAlign="center";x.lineWidth=5;x.strokeStyle="#000";x.fillStyle=f.isMe?"#ffd54a":"#fff";x.strokeText(f.name,128,28);x.fillText(f.name,128,28);
  if(!f.isMe){x.fillStyle="#000a";x.fillRect(38,40,180,14);x.fillStyle=f.hp/f.mhp>.35?"#3ddc5a":"#ff3b3b";x.fillRect(40,42,176*clamp(f.hp/f.mhp,0,1),10)}T.t.needsUpdate=true}
 function statsFor(p){const c=DT.CH[p.char]||DT.CH[0],w=DT.WP[p.weapon]||DT.WP[0],L=(p.lv&&p.lv[p.char])||1;
@@ -23,7 +23,7 @@ function makeFighter(o){
  const look=window.Rig.lookFor(o.charId,o.col);const rig=window.Rig.build(look,o.glow);rig.g.traverse(m=>{if(m.isMesh)m.castShadow=!m.userData.ol&&(!low||m.parent===rig.torso||m.parent===rig.hips||m.parent===rig.head)});scene.add(rig.g);
  const f=Object.assign({rig,look,x:0,y:0,z:0,vx:0,vy:0,vz:0,r:0,st:"free",stT:0,cd:[0,0,0,0],m1i:-1,m1T:0,m1CD:0,dashT:0,dashCD:0,dashDir:"F",blk:false,blkT:9,guard:100,awk:0,awT:0,fin:false,evT:0,inv:0,carry:null,pend:[],lock:0,root:null,buff:{},sh:0,ph:0,anState:"idle",fl:0,mv:false,air:false,dead:false,rt:0,hist:[],histT:0},o);
  f.kitDef=KITS[f.kit%KITS.length];nameTag(f);
- const ice=new THREE.Mesh(new THREE.BoxGeometry(2.4,5.4,2.4),new THREE.MeshStandardMaterial({color:0xaee9ff,transparent:true,opacity:.55,roughness:.1}));ice.position.y=2.7;ice.visible=false;rig.g.add(ice);f.ice=ice;
+ const ice=new THREE.Mesh(new THREE.BoxGeometry(2.4,6,2.4),new THREE.MeshStandardMaterial({color:0xaee9ff,transparent:true,opacity:.55,roughness:.1}));ice.position.y=3;ice.visible=false;rig.g.add(ice);f.ice=ice;
  return f}
 function removeFighter(f){if(f&&f.rig)scene.remove(f.rig.g);if(f&&f.carry)dropProp(f)}
 const alive=f=>f&&!f.dead;
@@ -331,7 +331,7 @@ function frame(rdt,draw){
  if(ch){bt-=rdt;if(bt<=0){bt=.08;sendState()}ct-=rdt;if(ct<=0){ct=1;$("arena").textContent=label+" · "+ch.count()+" online"}}
  // camera
  const sh=FX.update(dt,rdt);
- pitch=clamp(pitch,-.15,1.15);const tx=me.x,ty=me.y+3.6,tz=me.z;
+ pitch=clamp(pitch,-.15,1.15);const tx=me.x,ty=me.y+4.0,tz=me.z;
  let cx=tx+Math.sin(yaw)*Math.cos(pitch)*dist,cy=ty+Math.sin(pitch)*dist,cz=tz+Math.cos(yaw)*Math.cos(pitch)*dist;
  const cc=World.camClip(tx,ty,tz,cx,cy,cz);
  if(!camT)camT=new THREE.Vector3(cc[0],cc[1],cc[2]);camT.set(camT.x+(cc[0]-camT.x)*Math.min(1,rdt*18),camT.y+(cc[1]-camT.y)*Math.min(1,rdt*18),camT.z+(cc[2]-camT.z)*Math.min(1,rdt*18));
