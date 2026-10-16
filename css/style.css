@@ -34,3 +34,37 @@ input{width:100%;padding:11px;margin:5px 0;background:#090909;border:1px solid #
 canvas{position:fixed;inset:0;z-index:1}
 #toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#000e;border:1px solid var(--g);padding:10px 16px;border-radius:10px;z-index:99;opacity:0;pointer-events:none;transition:.3s;max-width:90vw}#toast.show{opacity:1}
 @media(max-width:650px){.grid2{grid-template-columns:1fr}.brand{display:none}}
+
+/* ---- city brawler HUD ---- */
+body.ingame .top{display:none}
+#fxc{position:absolute;inset:0;z-index:0;pointer-events:none}
+.hud{top:12px;left:12px;width:min(340px,62vw);background:linear-gradient(#000c,#0008);border:1px solid #ffffff22;padding:9px 10px}
+.hname{display:flex;justify-content:space-between;gap:8px;font-size:12px;letter-spacing:.5px}.hname span{color:#aaa;font-size:11px}
+.hud .bar{height:20px;border-radius:4px;background:#2a0d0d;border:1px solid #000}
+.hp{background:linear-gradient(#ff5a4a,#c81e1e)}
+.bar.aw{height:14px;background:#151515}.bar.aw span{line-height:14px;font-size:10px;font-weight:800;letter-spacing:1px}
+.awk{background:linear-gradient(90deg,#3a7bd5,#00d2ff);transition:width .1s}.awk.rdy{background:linear-gradient(90deg,#ffd54a,#ff8a00);animation:pulse .6s infinite alternate}.awk.on{background:linear-gradient(90deg,#ff2fd0,#ffd54a)}
+@keyframes pulse{to{filter:brightness(1.5)}}
+.evb{margin-top:5px;font-size:10px;font-weight:800;letter-spacing:1px;color:#777}.evb.rdy{color:#9ff}
+.tgt{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:min(300px,50vw);text-align:center;font-size:12px;background:#0009;border-radius:8px;padding:5px 8px}
+.combo{position:absolute;right:6vw;top:34%;font:900 44px system-ui;color:#fff;text-shadow:3px 3px 0 #c81e1e,0 0 12px #000;opacity:0;transform:scale(.6) rotate(-6deg);transition:.12s}
+.combo.on{opacity:1;transform:scale(1) rotate(-6deg)}
+.banner{position:absolute;top:24%;left:0;right:0;text-align:center;font:900 clamp(30px,7vw,72px) system-ui;letter-spacing:4px;text-shadow:0 0 18px #000,4px 4px 0 #000;opacity:0}
+.banner.show{animation:ban 1.6s forwards}
+@keyframes ban{0%{opacity:0;transform:scale(2)}12%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:scale(1.05)}}
+#feed{top:62px}
+.grabh{position:absolute;left:50%;bottom:28%;transform:translateX(-50%);background:#000b;border:1px solid var(--g);border-radius:8px;padding:6px 12px;font-weight:800;font-size:13px}
+.moves{position:absolute;right:12px;bottom:14px;display:flex;flex-direction:column;gap:5px;pointer-events:auto;width:200px}
+.mv{position:relative;display:flex;align-items:center;gap:8px;background:linear-gradient(90deg,#000d,#0007);border:1px solid #ffffff2a;border-left:3px solid #fff;border-radius:4px;color:#fff;padding:7px 9px;text-align:left;font-size:13px;overflow:hidden;touch-action:none}
+.mv i{font-style:normal;font-weight:900;color:var(--g);width:14px}.mv b{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mv.cd{opacity:.55;border-left-color:#555}.mv .cdv{font-weight:900;font-size:12px}
+.mv.aw,.mv.fin{border-left-color:#ff8a00}.mv.rdy{box-shadow:0 0 12px #ff8a00;opacity:1}
+.hint{position:absolute;left:12px;bottom:12px;max-width:min(560px,55vw);font-size:11px;color:#ddd;background:#0008;border-radius:8px;padding:6px 9px;line-height:1.45}
+.leave{top:12px;right:12px}
+#camPad{position:absolute;right:0;top:0;width:60%;height:100%;pointer-events:auto;touch-action:none}
+#joy{bottom:40px;left:24px;width:130px;height:130px;z-index:2}#knob{left:39px;top:39px}
+.tbs{right:10px;bottom:14px;grid-template-columns:repeat(3,62px);gap:8px;z-index:2}
+.tb{height:62px;border-radius:50%;background:#000a;border:2px solid #ffffff55;font-size:10px}
+.atk{background:#a8171799;border-color:#ff8080}
+@media(pointer:coarse),(max-width:700px){.moves{right:220px;bottom:14px;width:auto;flex-direction:row;flex-wrap:wrap;max-width:calc(100vw - 400px);gap:6px}.mv{flex-direction:column;gap:0;width:66px;height:58px;padding:5px;justify-content:center;font-size:9px;text-align:center;border-left-width:1px;border-top:3px solid #fff}.mv b{white-space:normal;line-height:1.1}.mv i{width:auto}.hud{width:min(260px,46vw);padding:6px}.combo{font-size:30px}}
+@media (max-width:700px) and (orientation:portrait){.moves{right:8px;bottom:250px;max-width:150px;justify-content:flex-end}}
