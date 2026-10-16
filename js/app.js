@@ -14,9 +14,10 @@ function hdr(){if(!P)return;$("who").textContent=P.username+(P.role!=="player"?"
  $("stats").textContent="Level "+lvOf(P)+"  |  Wins "+P.wins+"  |  Bot kills "+P.kills+"  |  "+P.chars.length+"/"+DT.CH.length+" fighters";
  $("adminBtn").classList.toggle("hide",P.role==="player")}
 function reward(r){P.coins+=Math.round((r.coins||0)*CFG.coinMult);P.xp+=r.xp||0;P.kills+=r.kills||0;P.wins+=r.wins||0;hdr();clearTimeout(svT);svT=setTimeout(save,800)}
-function go(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));$(id).classList.add("on");
+function go(id){if(window.Game&&Game.active){Game.stop();if(P)save()}if(!P&&id!=="homeScreen")id="homeScreen";document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));$(id).classList.add("on");
  if(P)hdr();if(id==="lockerScreen")locker();if(id==="shopScreen")shop();if(id==="boardScreen")board("wins");if(id==="adminScreen")admin();if(id==="guideScreen")guide()}
-async function login(fn){const u=$("uIn").value.trim(),p=$("pIn").value;$("authMsg").textContent="...";const r=await fn.call(B,u,p);if(r.error){$("authMsg").textContent=r.error;return}P=r.p;mega();$("authMsg").textContent="";go("menuScreen")}
+let busy=false;
+async function login(fn){if(busy)return;busy=true;const u=$("uIn").value.trim(),p=$("pIn").value;$("authMsg").textContent="Please wait...";let r;try{r=await fn.call(B,u,p)}catch(e){r={error:"Connection problem - try again"}}finally{busy=false}if(r.error){$("authMsg").textContent=r.error;return}P=r.p;mega();$("authMsg").textContent="";go("menuScreen")}
 function roll(bag){const w=bag.w,t=w.reduce((a,b)=>a+b,0);let r=Math.random()*t,ri=0;for(;ri<w.length-1;ri++){r-=w[ri];if(r<=0)break}
  const isW=Math.random()<.25,pool=(isW?DT.WP:DT.CH).filter(x=>x.rar===ri);return{w:isW,x:pool[Math.floor(Math.random()*pool.length)]}}
 function shop(){

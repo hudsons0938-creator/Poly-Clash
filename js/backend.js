@@ -18,12 +18,12 @@ async function cload(){
 }
 const API={cloud,
 async signUp(u,p){const e=bad(u,p);if(e)return{error:e};
- if(cloud){const {error}=await sb.auth.signUp({email:email(u),password:p,options:{data:{username:u}}});if(error)return{error:error.message};return API.signIn(u,p)}
+ if(cloud){const {error}=await sb.rpc("pc_register",{p_username:u,p_password:p});if(error)return{error:error.message||"Could not create account"};return API.signIn(u,p)}
  const a=get("pc_acc")||{},k=u.toLowerCase();if(a[k])return{error:"Username taken on this device"};
  const pr=blank(u);if(u.toLowerCase()===String(C.LOCAL_MEGA_USERNAME||"").toLowerCase())pr.role="mega";
  a[k]={pw:await sha(p),p:pr};set("pc_acc",a);set("pc_sess",k);return{p:pr}},
 async signIn(u,p){
- if(cloud){const {error}=await sb.auth.signInWithPassword({email:email(u),password:p});if(error)return{error:"Wrong username or password"};const pr=await cload();return pr?{p:pr}:{error:"Profile not found"}}
+ if(cloud){if(!u||!p)return{error:"Enter your username and password"};const {error}=await sb.auth.signInWithPassword({email:email(u),password:p});if(error)return{error:/invalid login|invalid_credentials/i.test(error.message+" "+(error.code||""))?"Wrong username or password":"Login failed: "+error.message};const pr=await cload();return pr?{p:pr}:{error:"Profile not found"}}
  const a=get("pc_acc")||{},k=u.toLowerCase();if(!a[k]||a[k].pw!==await sha(p))return{error:"Wrong username or password"};set("pc_sess",k);return{p:fix(a[k].p)}},
 async session(){
  if(cloud){const {data:{session}}=await sb.auth.getSession();return session?cload():null}
