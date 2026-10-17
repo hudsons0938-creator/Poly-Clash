@@ -3,7 +3,7 @@
 const T=()=>window.THREE;
 let scene,sun,hemi,low=false;
 const B=[];// building AABBs {x0,x1,z0,z1,h}
-const props=[];const debris=[];const decals=[];
+const props=[];const debris=[];const decals=[];const smashed=[];
 const HALF=170;
 const rnd=(a,b)=>a+Math.random()*(b-a);
 const mc={};function M(c,o){const k=c+JSON.stringify(o||0);if(!mc[k])mc[k]=new (T().MeshStandardMaterial)(Object.assign({color:c,roughness:.8},o||{}));return mc[k]}
@@ -20,7 +20,7 @@ let CRACK,WIN;
 function sky(){const c=document.createElement("canvas");c.width=4;c.height=256;const x=c.getContext("2d");const g=x.createLinearGradient(0,0,0,256);g.addColorStop(0,"#2b5fa8");g.addColorStop(.45,"#8db7e6");g.addColorStop(.6,"#f3d7b0");g.addColorStop(1,"#e8c9a0");x.fillStyle=g;x.fillRect(0,0,4,256);
  const t=new (T().CanvasTexture)(c);const s=new (T().Mesh)(new (T().SphereGeometry)(900,24,12),new (T().MeshBasicMaterial)({map:t,side:T().BackSide,fog:false}));scene.add(s)}
 // ---------- buildings ----------
-function building(cx,cz,w,d,h){
+function building(cx,cz,w,d,h){const before=scene.children.length;
  const geo=new (T().BoxGeometry)(w,h,d),uv=geo.attributes.uv;
  const fx=[d/6,d/6,0,0,w/6,w/6],fy=h/6;// faces: +x,-x,+y,-y,+z,-z
  for(let f=0;f<6;f++)for(let v=0;v<4;v++){const i=f*4+v;if(f===2||f===3){uv.setXY(i,0,0);continue}uv.setXY(i,uv.getX(i)*Math.max(1,Math.round(fx[f])),uv.getY(i)*Math.max(1,Math.round(fy)))}
@@ -35,7 +35,7 @@ function building(cx,cz,w,d,h){
  mesh(new (T().BoxGeometry)(w+.1,3.2,d+.1),M(0x25272d),cx,1.6,cz,null,false);
  if(Math.random()<.5){const col=[0xc62828,0x1565c0,0x2e7d32,0xf9a825,0x6a1b9a][Math.floor(Math.random()*5)];mesh(new (T().BoxGeometry)(w*.8,.3,1.4),M(col),cx,3.6,cz+d/2+.6)}
  if(Math.random()<.35){const nc=[0xff2fd0,0x00e5ff,0xffe14d,0xff5a36][Math.floor(Math.random()*4)];mesh(new (T().BoxGeometry)(.3,4,1.6),new (T().MeshStandardMaterial)({color:nc,emissive:nc,emissiveIntensity:1.2}),cx+w/2+.2,8,cz+rnd(-d/3,d/3),null,false)}
- B.push({x0:cx-w/2,x1:cx+w/2,z0:cz-d/2,z1:cz+d/2,h});
+ B.push({x0:cx-w/2,x1:cx+w/2,z0:cz-d/2,z1:cz+d/2,h,cx,cz,w,d,meshes:scene.children.slice(before)});
 }
 // ---------- props ----------
 const PT={
@@ -53,7 +53,7 @@ const PT={
 function addProp(type,x,z,ry,col){const def=PT[type],g=new (T().Group)();def.mk(g,col);g.position.set(x,0,z);g.rotation.y=ry||0;scene.add(g);
  const p={type,def,g,x,z,y:0,ry:ry||0,hx:x,hz:z,hry:ry||0,hp:def.hp,alive:true,held:null,fly:null,rt:0,col};if(type==="car")p.def=Object.assign({},def,{cols:[col,0x222222,0x9fd3ff]});props.push(p);return p}
 // ---------- build ----------
-function build(sc,q){scene=sc;low=!!q.low;B.length=0;props.length=0;debris.length=0;decals.length=0;
+function build(sc,q){scene=sc;low=!!q.low;B.length=0;props.length=0;debris.length=0;decals.length=0;smashed.length=0;
  WIN=winTex();CRACK=crackTex();
  scene.background=new (T().Color)(0x9fbfe0);scene.fog=new (T().Fog)(0xc9d6e3,90,320);sky();
  hemi=new (T().HemisphereLight)(0xdde8ff,0x4a4038,.75);scene.add(hemi);
@@ -139,6 +139,12 @@ function crater(x,z,s){if(decals.length>(low?14:30)){const o=decals.shift();scen
 function wallCrater(x,y,z,nx,nz,s){if(decals.length>(low?14:30)){const o=decals.shift();scene.remove(o.m)}
  const m=new (T().Mesh)(new (T().PlaneGeometry)(s*2,s*2),new (T().MeshBasicMaterial)({map:CRACK,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2}));m.position.set(x-nx*.85,y,z-nz*.85);m.lookAt(x+nx*5,y,z+nz*5);m.position.x+=nx*.06;m.position.z+=nz*.06;scene.add(m);decals.push({m,l:25});
  spawnDebris(x,y,z,[0x8b8f98,0x6f6a62],8,.8,.5)}
+// ---------- building destruction (Super Insane Mode) ----------
+function smash(b,hx,hz){if(!b||b.dead||!b.meshes)return false;b.dead=true;b.rt=45;b.meshes.forEach(m=>m.visible=false);const i=B.indexOf(b);if(i>=0)B.splice(i,1);smashed.push(b);
+ const n=low?20:45;for(let k=0;k<n;k++){const x=b.cx+(Math.random()-.5)*b.w,z=b.cz+(Math.random()-.5)*b.d,y=Math.random()*Math.min(b.h,30);spawnDebris(x,y,z,[0x8b8f98,0x6f6a62,0x3a4a5e,0xffe9a8],1,1.6,1.4)}
+ if(window.FX){for(let k=0;k<4;k++)FX.boom(b.cx+(Math.random()-.5)*b.w*.6,Math.random()*10+2,b.cz+(Math.random()-.5)*b.d*.6,0xbdb6a8,6);FX.shake(1.2)}
+ crater(hx!==undefined?hx:b.cx,hz!==undefined?hz:b.cz,6);return true}
+function smashNear(x,z,r){let n=0;B.slice().forEach(b=>{if(b.meshes&&!b.round){const cx=Math.max(b.x0,Math.min(x,b.x1)),cz=Math.max(b.z0,Math.min(z,b.z1));if(Math.hypot(cx-x,cz-z)<r){smash(b,cx,cz);n++}}});return n}
 // ---------- per-frame ----------
 function update(dt,focus){
  if(focus){sun.position.set(focus.x+60,110,focus.z+40);sun.target.position.set(focus.x,0,focus.z)}
@@ -147,10 +153,11 @@ function update(dt,focus){
   d.m.rotation.x+=d.rx*dt;d.m.rotation.z+=d.rz*dt;
   if(d.l<1){d.m.scale.setScalar(Math.max(.01,d.l))}if(d.l<=0){scene.remove(d.m);debris.splice(i,1)}}
  for(let i=decals.length-1;i>=0;i--){const d=decals[i];d.l-=dt;if(d.l<3)d.m.material.opacity=d.l/3;if(d.l<=0){scene.remove(d.m);decals.splice(i,1)}}
+ for(let i=smashed.length-1;i>=0;i--){const b=smashed[i];b.rt-=dt;if(b.rt<=0){b.dead=false;b.meshes.forEach(m=>m.visible=true);B.push(b);smashed.splice(i,1)}}
  for(const p of props){
   if(!p.alive){p.rt-=dt;if(p.rt<=0){p.alive=true;p.hp=p.def.hp;p.x=p.hx;p.z=p.hz;p.y=0;p.g.position.set(p.x,0,p.z);p.g.rotation.set(0,p.hry,0);p.g.visible=true}continue}
  }
 }
 function nearestProp(x,z,r,throwable){let b=null,bd=r;for(const p of props){if(!p.alive||p.held||p.fly)continue;if(throwable&&!p.def.throw)continue;const d=Math.hypot(p.x-x,p.z-z)-p.def.r*.5;if(d<bd){bd=d;b=p}}return b}
-window.World={build,update,resolve,camClip,blocked,breakProp,damageProps,crater,wallCrater,spawnDebris,nearestProp,props,B,HALF};
+window.World={build,update,smash,smashNear,resolve,camClip,blocked,breakProp,damageProps,crater,wallCrater,spawnDebris,nearestProp,props,B,HALF};
 })();

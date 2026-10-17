@@ -77,6 +77,13 @@ const KITS=[
  {n:"Accelerate",cd:16,rng:99,fn(f,K){K.play(f,"awaken",.4);f.lock=.3;K.buff(f,"spd",6);K.buff(f,"haste",6);FX.ring(f.x,.3,f.z,0xf0d9a0,8,.5);FX.burst(f.x,3,f.z,0xf0d9a0,16,8,.4,.5)}},
  {n:"Clock Hands",cd:9,rng:8,fn(f,K){K.play(f,"spin",.6);[.15,.4].forEach((t,i)=>K.later(f,t,()=>{FX.ring(f.x,2.5,f.z,0xf0d9a0,10,.3);K.around(f,f.x,f.z,8,i?H(9*D(f),"knock",{kb:32,up:10,col:0xf0d9a0}):H(5*D(f),"stun",{stun:.6,col:0xf0d9a0}),f.y)}))}}],
  fin:{n:"Zero Hour",fn(f,K){K.play(f,"finisher",1);K.later(f,.5,()=>{FX.flash("#e9dcb6",.7);FX.ring(f.x,.3,f.z,0xf0d9a0,50,1);K.around(f,f.x,f.z,40,H(10*D(f),"freeze",{stun:3.6,unblock:1,col:0xf0d9a0}),f.y);f.cd=[0,0,0,0]})}}}
+,
+{n:"Cosmic",col:0xff4dff,moves:[
+ {n:"Star Barrage",cd:7,rng:4.5,fn(f,K){barrage(f,K,7,0xff4dff,{},H(9*D(f),"launch",{up:28,kb:4,col:0xff4dff}))}},
+ {n:"Nova Beam",cd:7,rng:30,fn(f,K){K.play(f,"thrust",.5);K.later(f,.22,()=>{const F=K.fwd(f);FX.beam(f.x+F[0]*1.5,f.y+3,f.z+F[1]*1.5,f.x+F[0]*32,f.y+3,f.z+F[1]*32,0xff4dff,.9,.45);FX.shake(.4);K.foesOf(f).forEach(t=>{const dx=t.x-f.x,dz=t.z-f.z,along=dx*F[0]+dz*F[1],side=Math.abs(dx*F[1]-dz*F[0]);if(along>0&&along<32&&side<2.4)K.sendHit(f,t,H(15*D(f),"knock",{kb:40,up:10,col:0xff4dff}))});World.damageProps(f.x+F[0]*16,f.z+F[1]*16,10,60,F[0],F[1])})}},
+ {n:"Gravity Well",cd:9,rng:25,fn(f,K){K.play(f,"cast1",.45);const p=K.point(f,25);K.later(f,.2,()=>{FX.ring(p[0],.3,p[1],0xff4dff,10,.5);K.foesOf(f).forEach(t=>{if(Math.hypot(t.x-p[0],t.z-p[1])<9)K.sendHit(f,t,H(9*D(f),"launch",{up:30,kb:2,pull:[p[0],p[1]],col:0xff4dff}))})})}},
+ {n:"Comet Dash",cd:7,rng:25,fn(f,K){K.play(f,"dashF",.25);K.lunge(f,100,.22,H(12*D(f),"launch",{up:26,kb:6,col:0xff4dff}),0xff4dff);FX.speed(1)}}],
+ fin:{n:"Big Bang",fn(f,K){K.play(f,"finisher",1.3);f.vy=26;K.later(f,.8,()=>{FX.boom(f.x,f.y+2,f.z,0xff4dff,18);FX.boom(f.x,f.y+2,f.z,0xffffff,9);FX.flash("#f9f",.6);FX.shake(1.4);K.around(f,f.x,f.z,24,H(60*D(f),"knock",{kb:50,up:20,unblock:1,col:0xff4dff}),f.y);World.crater(f.x,f.z,12);World.damageProps(f.x,f.z,24,999,0,0)})}}}
 ];
 window.KITS=KITS;
 if(window.DATA)KITS.forEach((k,i)=>{const p=window.DATA.POWERS[i];if(p)p.d="Moves: "+k.moves.map(m=>m.n).join(", ")+". Awakened finisher: "+k.fin.n+"."});

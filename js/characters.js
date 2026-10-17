@@ -27,5 +27,12 @@ const POWERS=[{n:"Flame",fx:"burn",col:0xff6a00,d:"Skill hits set enemies on fir
 {n:"Time",fx:"haste",col:0xf0d9a0,d:"Skill hits shave 0.5s off all your cooldowns."}];
 const PIDX={};POWERS.forEach((p,i)=>{PIDX[p.n]=i});
 const SKINS=[["Default",null],["Crimson",0xc62828],["Ocean",0x1976d2],["Toxic",0x43a047],["Royal",0x7e57c2],["Gold",0xd8ad3d],["Obsidian",0x212121],["Snow",0xeceff1],["Sunset",0xff7043],["Neon Pink",0xff2fd0],["Cyan",0x00e5ff],["Blood Moon",0x8b0000]];
-window.DATA={RAR,CH,WP,BAGS,POWERS,PIDX,SKINS,START:rs.indexOf(0)};
+// ---- admin-exclusive content (never drops from bags; only granted by admins) ----
+RAR.push(["Exclusive",0xffd700]);
+POWERS.push({n:"Cosmic",fx:"crit",col:0xff4dff,d:"Exclusive cosmic power."});PIDX.Cosmic=POWERS.length-1;
+[["Overlord",19,0xd8ad3d],["Void Emperor",4,0x2a0838],["Celestial Judge",17,0xf2f2f2],["Storm Sovereign",18,0x1e88e5]].forEach((x,i)=>CH.push({id:400+i,name:x[0],rar:6,realm:"Admin Realm",pw:"Cosmic",col:x[2],hp:2.4,dmg:2.4,spd:1.25,agi:1.3,arch:x[1],ex:1}));
+[["Admin Gavel",5.2,.35,3.6,3],["Ban Hammer",6,.5,3.8,3],["Cosmic Blade",5,.3,4,0]].forEach((x,i)=>WP.push({id:60+i,name:x[0],rar:6,dmg:x[1],cd:x[2],rng:x[3],ls:.15,col:0xffd700,type:x[4],ex:1}));
+const TITLES=["Champion","Legend","Grandmaster","Untouchable","Combo King","Air Ace","VIP","Tester","Moderator","Founder"];
+const XPOWERS=[["god","God Mode"],["inf","No dash/evasive cooldown"],["speed","Speed boost"]];
+window.DATA={RAR,CH,WP,BAGS,POWERS,PIDX,SKINS,START:rs.indexOf(0),TITLES,XPOWERS,NORMAL_CH:400,NORMAL_WP:60};
 })();
